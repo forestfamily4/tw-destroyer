@@ -45,14 +45,14 @@ async function main(client: Account) {
       };
     });
 
-  console.log(result);
+  console.log(new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" }));
 
   for await (const r of result) {
     if (!idCheck(r.id)) {
       await axios.post(
         env("webhookUrl"),
         {
-          content: `https://fxtwitter.com/elonmusk/status/${r.id}`,
+          content: `https://fxtwitter.com/status/${r.id}`,
         },
         {
           headers: {
