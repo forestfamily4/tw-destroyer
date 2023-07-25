@@ -3,16 +3,25 @@ import dotenv from "dotenv";
 import axios from "axios";
 import { schedule } from "node-cron";
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs";
+import express from "express";
+
 dotenv.config();
+
+const app: express.Express = express();
+app.get("/", (req, res) => {
+  res.send("hello");
+});
+app.listen(3000)
 const client = new Account(
   env("email"),
   env("usrname"),
   env("password"),
+  false,
   false
 );
 client.login().then(() => {
   main(client);
-  schedule("* * * * *", () => {
+  schedule("30 * * * * *", () => {
     main(client);
   });
 });
@@ -24,20 +33,18 @@ async function main(client: Account) {
   const userTweets = await client.gql("GET", "UserTweets", {
     userId: env("userId"),
   });
-  const userData=await client.gql("GET","UserByRestId",{
+  const userData = await client.gql("GET", "UserByRestId", {
     userId: env("userId"),
-  })
+  });
 
-  const userIcon=userData.data.user.result.legacy.profile_image_url_https
-  const userScreenName=userData.data.user.result.legacy.screen_name
-  const userName=userData.data.user.result.legacy.name
+  const userIcon = userData.data.user.result.legacy.profile_image_url_https;
+  const userScreenName = userData.data.user.result.legacy.screen_name;
+  const userName = userData.data.user.result.legacy.name;
 
   const entries =
     userTweets.data.user.result.timeline_v2.timeline.instructions.filter(
       (x: any) => x.type === "TimelineAddEntries"
     )[0].entries;
-
-    
 
   const result = entries
     .map((e: any) => {
@@ -62,8 +69,8 @@ async function main(client: Account) {
         env("webhookUrl"),
         {
           content: `https://fxtwitter.com/status/${r.id}`,
-          avatar_url:userIcon,
-          username:`${userName} (@${userScreenName})`
+          avatar_url: userIcon,
+          username: `${userName} (@${userScreenName})`,
         },
         {
           headers: {
