@@ -8,10 +8,11 @@ import express from "express";
 dotenv.config();
 
 const app: express.Express = express();
-app.get("/", (req, res) => {
-  res.send("hello");
+app.use(express.static("public"));
+app.get("/*", (req, res) => {
+  res.redirect("/static");
 });
-app.listen(3000)
+app.listen(3000);
 const client = new Account(
   env("email"),
   env("usrname"),
@@ -21,7 +22,7 @@ const client = new Account(
 );
 client.login().then(() => {
   main(client);
-  schedule("30 * * * * *", () => {
+  schedule("2 * * * *", () => {
     main(client);
   });
 });
@@ -62,6 +63,7 @@ async function main(client: Account) {
     });
 
   console.log(new Date());
+  statusLog();
 
   for await (const r of result) {
     if (!idCheck(r.id)) {
@@ -102,4 +104,19 @@ function env(s: string) {
     throw new Error(`env ${s} is not defined`);
   }
   return k;
+}
+
+async function statusLog() {
+  let data = readFileSync("public/status_report.log", "utf-8");
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hour = date.getHours();
+  const minute = date.getMinutes();
+
+  const dateStr = `${year}-${month}-${day} ${hour}:${minute}`;
+  data += `\n${dateStr},success`;
+
+  writeFile("public/status_report.log", data, (err) => {});
 }
