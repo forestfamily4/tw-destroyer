@@ -21,26 +21,48 @@ const client = new Account(
   false
 );
 client.login().then(() => {
-  main(client);
-  schedule("2 * * * *", () => {
-    main(client);
+  const userIds = env("userIds").split(",");
+  const a = async () => {
+    for await (const userId of userIds) {
+      await main(userId);
+    }
+  };
+  a();
+  schedule("2 * * * *", async () => {
+    await a();
+    statusLog();
   });
 });
 if (!existsSync("id.txt")) {
   writeFileSync("id.txt", "");
 }
 
-async function main(client: Account) {
+async function main(userId: string) {
+  const data = await getTweets(userId);
+  for await (const r of data.result.values()) {
+    if (!idCheck(r.id)) {
+      await axios.post(env("webhookUrl"), {
+        content: `https://fxtwitter.com/status/${r.id}\n${r.createdAt}`,
+        avatar_url: data.userIcon,
+        username: `${data.userName} (@${data.userScreenName})`,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+}
+
+async function getTweets(userId: string) {
   const userTweets = await client.gql("GET", "UserTweets", {
-    userId: env("userId"),
+    userId: userId,
   });
   const userData = await client.gql("GET", "UserByRestId", {
-    userId: env("userId"),
+    userId: userId,
   });
 
-  const userIcon = userData.data.user.result.legacy.profile_image_url_https;
-  const userScreenName = userData.data.user.result.legacy.screen_name;
-  const userName = userData.data.user.result.legacy.name;
+  const userIcon: string =
+    userData.data.user.result.legacy.profile_image_url_https;
+  const userScreenName: string = userData.data.user.result.legacy.screen_name;
+  const userName: string = userData.data.user.result.legacy.name;
 
   const entries =
     userTweets.data.user.result.timeline_v2.timeline.instructions.filter(
@@ -52,37 +74,32 @@ async function main(client: Account) {
       return e.content?.itemContent?.tweet_results?.result?.legacy;
     })
     .filter((x: any) => x !== undefined)
-    .filter((x: any) => x.user_id_str === env("userId"))
-    .filter((x: any) => x.entities?.media?.length > 0)
+    .filter((x: any) => x.user_id_str === userId)
     .map((x: any) => {
       return {
         id: x.id_str,
         text: x.full_text,
-        media: x.entities.media.map((m: any) => m.media_url_https),
+        media:
+          x.entities?.media?.length > 0
+            ? x.entities.media.map((m: any) => m.media_url_https)
+            : "",
+            createdAt:x.created_at
       };
-    });
-
-  console.log(new Date());
-  statusLog();
-
-  for await (const r of result) {
-    if (!idCheck(r.id)) {
-      await axios.post(
-        env("webhookUrl"),
-        {
-          content: `https://fxtwitter.com/status/${r.id}`,
-          avatar_url: userIcon,
-          username: `${userName} (@${userScreenName})`,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }) as Map<
+    string,
+    {
+      id: string;
+      text: string;
+      media: string;
+      createdAt:string
     }
-  }
+  >;
+  return {
+    result: result,
+    userIcon: userIcon,
+    userScreenName: userScreenName,
+    userName: userName,
+  };
 }
 
 function idCheck(id: string) {
