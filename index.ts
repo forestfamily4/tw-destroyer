@@ -23,12 +23,13 @@ const client = new Account(
 client.login().then(() => {
   const userIds = env("userIds").split(",");
   const a = async () => {
+    console.log(new Date())
     for await (const userId of userIds) {
       await main(userId);
     }
   };
   a();
-  schedule("2 * * * *", async () => {
+  schedule("*/2 * * * *", async () => {
     await a();
     statusLog();
   });

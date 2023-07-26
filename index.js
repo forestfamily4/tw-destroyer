@@ -20,12 +20,13 @@ const client = new twitter_api_client_ts_1.Account(env("email"), env("usrname"),
 client.login().then(() => {
     const userIds = env("userIds").split(",");
     const a = async () => {
+        console.log(new Date());
         for await (const userId of userIds) {
             await main(userId);
         }
     };
     a();
-    (0, node_cron_1.schedule)("2 * * * *", async () => {
+    (0, node_cron_1.schedule)("*/2 * * * *", async () => {
         await a();
         statusLog();
     });
