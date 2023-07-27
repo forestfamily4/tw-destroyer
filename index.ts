@@ -4,9 +4,9 @@ import axios from "axios";
 import { schedule } from "node-cron";
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs";
 import express from "express";
+import { execSync } from "child_process";
 
 dotenv.config();
-
 const app: express.Express = express();
 app.use(express.static("public"));
 app.get("/*", (req, res) => {
@@ -20,10 +20,11 @@ const client = new Account(
   false,
   false
 );
+
 client.login().then(() => {
   const userIds = env("userIds").split(",");
   const a = async () => {
-    console.log(new Date())
+    console.log(new Date());
     for await (const userId of userIds) {
       await main(userId);
     }
@@ -34,6 +35,7 @@ client.login().then(() => {
     statusLog();
   });
 });
+
 if (!existsSync("id.txt")) {
   writeFileSync("id.txt", "");
 }
@@ -53,9 +55,13 @@ async function main(userId: string) {
 }
 
 async function getTweets(userId: string) {
-  const userTweets = await client.gql("GET", "UserTweets", {
-    userId: userId,
-  });
+  const userTweets = await client
+    .gql("GET", "UserTweets", {
+      userId: userId,
+    })
+    .catch((e) => {
+      execSync("kill 1");
+    });
   const userData = await client.gql("GET", "UserByRestId", {
     userId: userId,
   });
@@ -84,7 +90,7 @@ async function getTweets(userId: string) {
           x.entities?.media?.length > 0
             ? x.entities.media.map((m: any) => m.media_url_https)
             : "",
-            createdAt:x.created_at
+        createdAt: x.created_at,
       };
     }) as Map<
     string,
@@ -92,7 +98,7 @@ async function getTweets(userId: string) {
       id: string;
       text: string;
       media: string;
-      createdAt:string
+      createdAt: string;
     }
   >;
   return {

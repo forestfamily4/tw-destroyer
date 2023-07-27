@@ -9,6 +9,7 @@ const axios_1 = __importDefault(require("axios"));
 const node_cron_1 = require("node-cron");
 const fs_1 = require("fs");
 const express_1 = __importDefault(require("express"));
+const child_process_1 = require("child_process");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(express_1.default.static("public"));
@@ -48,8 +49,12 @@ async function main(userId) {
     }
 }
 async function getTweets(userId) {
-    const userTweets = await client.gql("GET", "UserTweets", {
+    const userTweets = await client
+        .gql("GET", "UserTweets", {
         userId: userId,
+    })
+        .catch((e) => {
+        (0, child_process_1.execSync)("kill 1");
     });
     const userData = await client.gql("GET", "UserByRestId", {
         userId: userId,
@@ -71,7 +76,7 @@ async function getTweets(userId) {
             media: x.entities?.media?.length > 0
                 ? x.entities.media.map((m) => m.media_url_https)
                 : "",
-            createdAt: x.created_at
+            createdAt: x.created_at,
         };
     });
     return {
