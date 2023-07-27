@@ -2,3 +2,4 @@
 node_modules
 tw_session.json
 id.txt
+*.log
