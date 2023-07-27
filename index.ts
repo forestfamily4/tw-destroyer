@@ -45,7 +45,7 @@ async function main(userId: string) {
   for await (const r of data.result.values()) {
     if (!idCheck(r.id)) {
       await axios.post(env("webhookUrl"), {
-        content: `https://fxtwitter.com/status/${r.id}\n${r.createdAt}`,
+        content: `https://twitter.com/zrsio4/status/${r.id}\n${r.createdAt}`,
         avatar_url: data.userIcon,
         username: `${data.userName} (@${data.userScreenName})`,
       });
