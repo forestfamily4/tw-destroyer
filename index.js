@@ -19,11 +19,13 @@ app.get("/*", (req, res) => {
 app.listen(3000);
 const client = new twitter_api_client_ts_1.Account(env("email"), env("usrname"), env("password"), false, false);
 client.login().then(() => {
-    const userIds = env("userIds").split(",");
+    const data = JSON.parse(env("data")).data;
     const a = async () => {
-        console.log(new Date());
-        for await (const userId of userIds) {
-            await main(userId);
+        console.log(new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }));
+        for await (const d of data) {
+            for await (const userId of d.userId) {
+                await main(userId, d.url);
+            }
         }
     };
     a();
@@ -35,15 +37,15 @@ client.login().then(() => {
 if (!(0, fs_1.existsSync)("id.txt")) {
     (0, fs_1.writeFileSync)("id.txt", "");
 }
-async function main(userId) {
+async function main(userId, webhookURL) {
     const data = await getTweets(userId);
     for await (const r of data.result.values()) {
         if (!idCheck(r.id)) {
-            await axios_1.default.post(env("webhookUrl"), {
-                content: `https://twitter.com/zrsio4/status/${r.id}\n${r.createdAt}`,
+            await axios_1.default.post(webhookURL, {
+                content: `https://fxtwitter.com/status/${r.id}\n${r.createdAt}`,
                 avatar_url: data.userIcon,
                 username: `${data.userName} (@${data.userScreenName})`,
-            });
+            }).catch(e => { console.log(e); });
             await new Promise((resolve) => setTimeout(resolve, 1000));
         }
     }
@@ -107,7 +109,7 @@ function env(s) {
 }
 async function statusLog() {
     let data = (0, fs_1.readFileSync)("public/status_report.log", "utf-8");
-    const date = new Date();
+    const date = new Date(new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" }));
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();

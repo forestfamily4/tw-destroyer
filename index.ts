@@ -21,12 +21,19 @@ const client = new Account(
   false
 );
 
+type WebhookData = Array<{
+  url: string,
+  userId: Array<string>
+}>
+
 client.login().then(() => {
-  const userIds = env("userIds").split(",");
+  const data: WebhookData = JSON.parse(env("data")).data
   const a = async () => {
-    console.log(new Date());
-    for await (const userId of userIds) {
-      await main(userId);
+    console.log(new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }));
+    for await (const d of data) {
+      for await (const userId of d.userId) {
+        await main(userId, d.url);
+      }
     }
   };
   a();
@@ -40,15 +47,15 @@ if (!existsSync("id.txt")) {
   writeFileSync("id.txt", "");
 }
 
-async function main(userId: string) {
+async function main(userId: string, webhookURL: string) {
   const data = await getTweets(userId);
   for await (const r of data.result.values()) {
     if (!idCheck(r.id)) {
-      await axios.post(env("webhookUrl"), {
-        content: `https://twitter.com/zrsio4/status/${r.id}\n${r.createdAt}`,
+      await axios.post(webhookURL, {
+        content: `https://fxtwitter.com/status/${r.id}\n${r.createdAt}`,
         avatar_url: data.userIcon,
         username: `${data.userName} (@${data.userScreenName})`,
-      });
+      }).catch(e => { console.log(e) });
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
@@ -93,14 +100,14 @@ async function getTweets(userId: string) {
         createdAt: x.created_at,
       };
     }) as Map<
-    string,
-    {
-      id: string;
-      text: string;
-      media: string;
-      createdAt: string;
-    }
-  >;
+      string,
+      {
+        id: string;
+        text: string;
+        media: string;
+        createdAt: string;
+      }
+    >;
   return {
     result: result,
     userIcon: userIcon,
@@ -132,7 +139,7 @@ function env(s: string) {
 
 async function statusLog() {
   let data = readFileSync("public/status_report.log", "utf-8");
-  const date = new Date();
+  const date = new Date(new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" }));
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
@@ -142,5 +149,5 @@ async function statusLog() {
   const dateStr = `${year}-${month}-${day} ${hour}:${minute}`;
   data += `\n${dateStr},success`;
 
-  writeFile("public/status_report.log", data, (err) => {});
-}
+  writeFile("public/status_report.log", data, (err) => { });
+}  
