@@ -21,7 +21,7 @@ const client = new twitter_api_client_ts_1.Account(env("email"), env("usrname"),
 client.login().then(() => {
     const data = JSON.parse(env("data")).data;
     const a = async () => {
-        console.log(new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }));
+        console.log(new Date(Date.now() + 9 * 60 * 60 * 1000));
         for await (const d of data) {
             for await (const userId of d.userId) {
                 await main(userId, d.url);
@@ -109,7 +109,7 @@ function env(s) {
 }
 async function statusLog() {
     let data = (0, fs_1.readFileSync)("public/status_report.log", "utf-8");
-    const date = new Date(new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" }));
+    const date = new Date(Date.now() + 9 * 60 * 60 * 1000);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
