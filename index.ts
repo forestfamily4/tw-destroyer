@@ -22,12 +22,12 @@ const client = new Account(
 );
 
 type WebhookData = Array<{
-  url: string,
-  userId: Array<string>
-}>
+  url: string;
+  userId: Array<string>;
+}>;
 
 client.login().then(() => {
-  const data: WebhookData = JSON.parse(env("data")).data
+  const data: WebhookData = JSON.parse(env("data")).data;
   const a = async () => {
     console.log(new Date(Date.now() + 9 * 60 * 60 * 1000));
     for await (const d of data) {
@@ -51,23 +51,30 @@ async function main(userId: string, webhookURL: string) {
   const data = await getTweets(userId);
   for await (const r of data.result.values()) {
     if (!idCheck(r.id)) {
-      await axios.post(webhookURL,  {
-        username: `${data.userName} (@${data.userScreenName})`,
-        avatar_url: data.userIcon,
-        tts: false,
-        embeds: [
-          {
-            type: "rich",
-            title: `${data.userName} (@${data.userScreenName})`,
-            description: r.text,
-            color: 0x00ffff,
-            image: {
-              url: r.media ? r.media[0] : undefined,
+      await axios
+        .post(webhookURL, {
+          username: `${data.userName} (@${data.userScreenName})`,
+          avatar_url: data.userIcon,
+          tts: false,
+          embeds: [
+            {
+              type: "rich",
+              title: `${data.userName} (@${data.userScreenName})`,
+              description: r.text,
+              color: 0x00ffff,
+              image: {
+                url: r.media ? r.media[0] : undefined,
+              },
+              url: `https://twitter.com/${data.userScreenName}/status/${r.id}`,
+              timestamp: new Date(
+                new Date(r.createdAt).getTime() + 9 * 60 * 60 * 1000
+              ),
             },
-            url: `https://twitter.com/${data.userScreenName}/status/${r.id}`,
-          }
-        ],
-      }).catch(e => { console.log(e) });
+          ],
+        })
+        .catch((e) => {
+          console.log(e);
+        });
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
@@ -112,14 +119,14 @@ async function getTweets(userId: string) {
         createdAt: x.created_at,
       };
     }) as Map<
-      string,
-      {
-        id: string;
-        text: string;
-        media?: string[];
-        createdAt: string;
-      }
-    >;
+    string,
+    {
+      id: string;
+      text: string;
+      media?: string[];
+      createdAt: string;
+    }
+  >;
   return {
     result: result,
     userIcon: userIcon,
@@ -151,7 +158,7 @@ function env(s: string) {
 
 async function statusLog() {
   let data = readFileSync("public/status_report.log", "utf-8");
-  const date = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const date = new Date(Date.now() + 9 * 60 * 60 * 1000);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
@@ -161,5 +168,5 @@ async function statusLog() {
   const dateStr = `${year}-${month}-${day} ${hour}:${minute}`;
   data += `\n${dateStr},success`;
 
-  writeFile("public/status_report.log", data, (err) => { });
-}  
+  writeFile("public/status_report.log", data, (err) => {});
+}
