@@ -64,7 +64,7 @@ async function main(userId: string, webhookURL: string) {
             image: {
               url: r.media ? r.media[0] : undefined,
             },
-            url: `https://tw.com`,
+            url: `https://twitter.com/${data.userScreenName}/status/${r.id}`,
           }
         ],
       }).catch(e => { console.log(e) });
