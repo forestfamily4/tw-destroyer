@@ -1,1 +1,1 @@
-run="dist/index.js"
+run="node dist/index.js"
