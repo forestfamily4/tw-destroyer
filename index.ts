@@ -67,7 +67,7 @@ async function main(userId: string, webhookURL: string) {
               },
               url: `https://twitter.com/${data.userScreenName}/status/${r.id}`,
               timestamp: new Date(
-                new Date(r.createdAt).getTime() + 9 * 60 * 60 * 1000
+                new Date(r.createdAt).getTime()
               ),
             },
           ],
