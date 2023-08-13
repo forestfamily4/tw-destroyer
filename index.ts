@@ -116,7 +116,11 @@ async function getTweets(userId: string) {
       {
         id: string;
         text: string;
+<<<<<<< HEAD
         media?: string[];
+=======
+        media: string;
+>>>>>>> 06df63383803a4286e9fce677e53fb8b1b0a2cc9
         createdAt: string;
       }
     >;
