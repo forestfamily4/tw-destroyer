@@ -17,7 +17,7 @@ const client = new Account(
   env("email"),
   env("usrname"),
   env("password"),
-  false,
+  true,
   false
 );
 
