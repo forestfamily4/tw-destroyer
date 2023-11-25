@@ -1,0 +1,27 @@
+{
+	"compilerOptions": {
+		"target": "es2022",
+		"module":"NodeNext",
+		"allowJs": true,
+		"skipLibCheck": true,
+		"strict": false,
+		"forceConsistentCasingInFileNames": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"baseUrl": ".",
+		"outDir": "dist"
+	},
+	"exclude": [
+		"node_modules",
+		"dist"
+	],
+	"include": [
+		"**/*.ts",
+		"**/*.mts"
+	],
+	"ts-node": {
+		"esm": true,
+		"require": ["tsconfig-paths/register"]
+	}
+}
