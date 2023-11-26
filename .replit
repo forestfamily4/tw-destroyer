@@ -1,4 +1,4 @@
-run="node dist/index.js"
+run="npm start"
 
 [nix]
 channel = "stable-22_11"
