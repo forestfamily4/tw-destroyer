@@ -1,1 +1,4 @@
 run="node dist/index.js"
+
+[nix]
+channel = "stable-22_11"
