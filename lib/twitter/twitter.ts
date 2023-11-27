@@ -1,4 +1,7 @@
-import { TwitterOpenApi, TwitterOpenApiClient } from "twitter-openapi-typescript";
+import {
+  TwitterOpenApi,
+  TwitterOpenApiClient,
+} from "twitter-openapi-typescript";
 import { env } from "../util";
 import { login } from "./login";
 import { subscriptionCollection } from "../db";
@@ -10,10 +13,10 @@ export class Twitter {
     channelId: string;
     userId: string;
     twitterUserId: string;
-  }[] = []
-  private interval = 10 * 60 * 1000
-  private timer: NodeJS.Timeout | null = null
-  constructor() { }
+  }[] = [];
+  private interval = 10 * 60 * 1000;
+  private timer: NodeJS.Timeout | null = null;
+  constructor() {}
   public async login() {
     this.client = await getApiClientFromEmailAndPassword(
       env("email"),
@@ -28,7 +31,9 @@ export class Twitter {
     return (await this.client.getTweetApi().getUserTweets({ "userId": user.user.restId, "count": 10 })).data.data
   }
   public async getUser(userid: string) {
-    if (this.client === null) { return undefined; }
+    if (this.client === null) {
+      return undefined;
+    }
     if (userid.match(/^[0-9]+$/) !== null) {
       const data = (await this.client.getUserApi().getUserByRestId({ "userId": userid })).data
       return data
@@ -79,7 +84,7 @@ export class Twitter {
     if (this.timer) {
       clearInterval(this.timer)
     }
-    this.startTimer(client)
+    this.startTimer(client);
   }
 }
 

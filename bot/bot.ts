@@ -17,7 +17,7 @@ export class Bot {
             intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
         });
 
-
+      
         this.commandManager = new commandManager(this)
         this.eventManager = new eventManager(this)
         this.buttonManager = new buttonManager(this)
