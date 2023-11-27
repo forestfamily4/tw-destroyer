@@ -54,7 +54,6 @@ export class Twitter {
             if (!time) { return }
             const date = new Date(time)
             if (now.getTime() - date.getTime() < this.interval) {
-              console.log(tweet.tweet.legacy?.entities.media?.[0]?.)
               const embed = new EmbedBuilder()
                 .setTitle(
                   `${tweet.user?.legacy.name}さんによるツイート (@${tweet.user?.legacy.screenName})`
