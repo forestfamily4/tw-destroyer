@@ -16,7 +16,7 @@ export class Twitter {
   }[] = [];
   private interval = 10 * 60 * 1000;
   private timer: NodeJS.Timeout | null = null;
-  constructor() {}
+  constructor() { }
   public async login() {
     this.client = await getApiClientFromEmailAndPassword(
       env("email"),
@@ -54,16 +54,25 @@ export class Twitter {
             if (!time) { return }
             const date = new Date(time)
             if (now.getTime() - date.getTime() < this.interval) {
-              const embed = new EmbedBuilder({
-                title: `${tweet.user?.legacy.name} (@${tweet.user?.legacy.screenName})`,
-                description: tweet.tweet.legacy?.fullText,
-                color: 0x00ffff,
-                image: {
-                  url: tweet.tweet.legacy?.entities?.media?.[0]?.url ?? "",
-                },
-                url: `https://twitter.com/${tweet.user?.legacy.screenName}/status/${tweet.tweet.legacy?.idStr}`,
-                timestamp: date,
-              })
+              console.log(tweet.tweet.legacy?.entities.media?.[0]?.)
+              const embed = new EmbedBuilder()
+                .setTitle(
+                  `${tweet.user?.legacy.name}さんによるツイート (@${tweet.user?.legacy.screenName})`
+                )
+                .setURL(
+                  `https://twitter.com/${tweet.user?.legacy.screenName}/status/${tweet.tweet.legacy?.idStr}`
+                )
+                .setTimestamp(date)
+                .setColor(0x00ffff)
+                .setImage(
+                  tweet.tweet.legacy?.entities?.media?.[0]?.mediaUrlHttps ?? ""
+                )
+                .setDescription(tweet.tweet.legacy?.fullText ?? "none")
+                .setAuthor({
+                  name: tweet.user?.legacy.name ?? "none",
+                  url: `https://twitter.com/${tweet.user?.legacy.screenName}`,
+                  iconURL: tweet.user?.legacy.profileImageUrlHttps ?? "none",
+                });
               const channel = client.channels.cache.get(sub.channelId)
               if (channel?.isTextBased()) {
                 channel.send({ embeds: [embed] })
