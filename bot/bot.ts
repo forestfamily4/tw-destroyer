@@ -17,7 +17,7 @@ export class Bot {
             intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
         });
 
-      
+
         this.commandManager = new commandManager(this)
         this.eventManager = new eventManager(this)
         this.buttonManager = new buttonManager(this)
@@ -33,7 +33,14 @@ export class Bot {
     public async login() {
         await this.reload()
         await this.client.login(config.token)
-        await this.twitter.login()
+        try {
+            await this.twitter.login()
+        }
+        catch (e) {
+            //rate limit
+            await new Promise(resolve => setTimeout(resolve, 1000 * 60 * 15))
+            await this.twitter.login()
+        }
         return this
     }
 }

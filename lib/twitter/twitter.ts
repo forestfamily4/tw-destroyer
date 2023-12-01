@@ -18,11 +18,13 @@ export class Twitter {
   private timer: NodeJS.Timeout | null = null;
   constructor() { }
   public async login() {
-    this.client = await getApiClientFromEmailAndPassword(
+    return getApiClientFromEmailAndPassword(
       env("email"),
       env("user"),
       env("password")
-    );
+    ).then(client=>{
+      this.client=client
+    })
   }
   public async getTweets(userid: string) {
     if (this.client === null) { return; }
