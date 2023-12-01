@@ -38,7 +38,7 @@ export class Bot {
         }
         catch (e) {
             //rate limit
-            this.client.user.setActivity("レートリミットなう", { type: ActivityType.Competing })
+            this.client.user?.setActivity("レートリミットなう 15分待機", { type: ActivityType.Competing })
             await new Promise(resolve => setTimeout(resolve, 1000 * 60 * 15))
             await this.twitter.login()
         }
