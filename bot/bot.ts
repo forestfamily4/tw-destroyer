@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { ActivityType, Client, GatewayIntentBits } from "discord.js";
 import { Twitter } from '../lib/twitter/twitter';
 import { buttonManager } from "./manager/buttons.js";
 import { commandManager } from "./manager/commands.js";
@@ -38,6 +38,7 @@ export class Bot {
         }
         catch (e) {
             //rate limit
+            this.client.user.setActivity("レートリミットなう", { type: ActivityType.Competing })
             await new Promise(resolve => setTimeout(resolve, 1000 * 60 * 15))
             await this.twitter.login()
         }
