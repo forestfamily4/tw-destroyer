@@ -26,7 +26,7 @@ export class Bot {
     public async reload() {
         await this.commandManager.reload()
         await this.eventManager.reload()
-        await this.buttonManager.reload()
+        //await this.buttonManager.reload()
         return this
     }
 
