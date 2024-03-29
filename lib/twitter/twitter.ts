@@ -21,7 +21,8 @@ export class Twitter {
     return getApiClientFromEmailAndPassword(
       env("email"),
       env("user"),
-      env("password")
+      env("password"),
+      ()=>env("code")
     ).then(client=>{
       this.client=client
     })
