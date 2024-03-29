@@ -1,0 +1,8 @@
+name: xbot
+services:
+  xbot:
+    image:  xbot
+    env_file:
+      - .env
+    # volumes:
+    #   - .env:/app/.env
