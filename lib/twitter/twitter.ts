@@ -18,14 +18,24 @@ export class Twitter {
   private timer: NodeJS.Timeout | null = null;
   constructor() { }
   public async login() {
-    return getApiClientFromEmailAndPassword(
-      env("email"),
-      env("user"),
-      env("password"),
-      ()=>env("code")
-    ).then(client=>{
-      this.client=client
-    })
+    // return getApiClientFromEmailAndPassword(
+    //   env("email"),
+    //   env("user"),
+    //   env("password"),
+    //   ()=>env("code")
+    // ).then(client=>{
+    //   this.client=client
+    // })
+    return new TwitterOpenApi().getClientFromCookies(
+      env("COOKIE").split("; ").reduce(
+        (acc, cur) => {
+          const [key, value] = cur.split("=");
+          acc[key] = value;
+          return acc;
+        },
+        {} as { [key: string]: string },
+      )
+    )
   }
   public async getTweets(userid: string) {
     if (this.client === null) { return; }

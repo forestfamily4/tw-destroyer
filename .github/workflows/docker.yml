@@ -37,3 +37,25 @@ jobs:
           tags: |
             ghcr.io/${{ env.GITHUB_OWNER }}/${{ env.IMAGE_NAME }}:latest
             ghcr.io/${{ env.GITHUB_OWNER}}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+  server_deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Install SSH key of target
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY_OF_TARGET }}
+          name: id_rsa-target
+          known_hosts: ${{ secrets.KNOWN_HOSTS_OF_TARGET }} # will be appended to existing .ssh/known_hosts
+          config: | # will be appended to existing .ssh/config
+            Host target
+            HostName ${{ secrets.HOSTNAME }}
+            User ${{ secrets.USERNAME }}
+            IdentityFile ~/.ssh/id_rsa-target
+      - name: Deploy to target
+        run: |
+          ssh target 'bash -s' < deploy.sh
