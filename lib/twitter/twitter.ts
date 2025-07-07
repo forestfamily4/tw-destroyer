@@ -26,7 +26,7 @@ export class Twitter {
     // ).then(client=>{
     //   this.client=client
     // })
-    return new TwitterOpenApi().getClientFromCookies(
+    this.client = await new TwitterOpenApi().getClientFromCookies(
       env("COOKIE").split("; ").reduce(
         (acc, cur) => {
           const [key, value] = cur.split("=");
@@ -61,6 +61,7 @@ export class Twitter {
       this.subscriptions.forEach(async sub => {
         try {
           const tweets = await this.getTweets(sub.twitterUserId)
+          console.log(tweets)
           const now = new Date()
           tweets?.forEach(async tweet => {
             const time = tweet.tweet.legacy?.createdAt;
