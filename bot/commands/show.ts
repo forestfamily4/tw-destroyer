@@ -8,10 +8,10 @@ export const handler: commandHandler = {
     authority: "everyone",
     exec(bot, message, args) {
         subscriptionCollection.find({
-            "channelId": message.channel.id,
+            // "channelId": message.channel.id,
             "userId": message.author.id,
         }).toArray().then((a) => {
-            message.reply(`登録されているユーザー: ${a.map((a) => `<#${a.channelId}> ${a.twitterUserId}`).join("\n")}`)
+            message.reply(`登録されているユーザー: ${a.map((a) => `<#${a.channelId}> https://twitter.com/i/user/${a.twitterUserId}`).join("\n")}`)
         })
     },
 }
