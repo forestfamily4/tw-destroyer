@@ -54,7 +54,7 @@ const updateToken = async (
 
     const subtasks = info.subtasks;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    subtasks?.forEach((task:any) => {
+    subtasks?.forEach((task: any) => {
       if (task.enter_text?.keyboard_type === "email") {
         console.log(
           chalk.yellow(
