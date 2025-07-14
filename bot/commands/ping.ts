@@ -6,6 +6,6 @@ export const handler: commandHandler = {
     aliases: ["pong"],
     authority: "everyone",
     exec(bot, message, args) {
-        message.reply(`ping: ${Date.now() - message.createdTimestamp}ms\nbotbotは最高にゴミです。`)
+        message.reply(`ping: ${Date.now() - message.createdTimestamp}ms`)
     },
 }
