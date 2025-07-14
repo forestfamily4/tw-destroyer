@@ -1,6 +1,6 @@
 name: xbot
 services:
   xbot:
-    image:  ghcr.io/forestfamily4/xbot:latest
+    image: ghcr.io/forestfamily4/xbot:latest
     env_file:
       - .env

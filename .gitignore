@@ -5,3 +5,5 @@ id.txt
 *.log
 dist/
 public/status_report.log
+.yarn
+.pnp.*

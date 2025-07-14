@@ -16,7 +16,7 @@ export class Twitter {
   }[] = [];
   private interval = 10 * 60 * 1000;
   private timer: NodeJS.Timeout | null = null;
-  constructor() { }
+  constructor() {}
   public async login() {
     // return getApiClientFromEmailAndPassword(
     //   env("email"),
@@ -27,58 +27,74 @@ export class Twitter {
     //   this.client=client
     // })
     this.client = await new TwitterOpenApi().getClientFromCookies(
-      env("COOKIE").split("; ").reduce(
-        (acc, cur) => {
-          const [key, value] = cur.split("=");
-          acc[key] = value;
-          return acc;
-        },
-        {} as { [key: string]: string },
-      )
-    )
+      env("COOKIE")
+        .split("; ")
+        .reduce(
+          (acc, cur) => {
+            const [key, value] = cur.split("=");
+            acc[key] = value;
+            return acc;
+          },
+          {} as { [key: string]: string },
+        ),
+    );
   }
   public async getTweets(userid: string) {
-    if (this.client === null) { return; }
-    const user = await this.getUser(userid)
-    if (!user?.user) { return undefined }
-    return (await this.client.getTweetApi().getUserTweets({ "userId": user.user.restId, "count": 10 })).data.data
+    if (this.client === null) {
+      return;
+    }
+    const user = await this.getUser(userid);
+    if (!user?.user) {
+      return undefined;
+    }
+    return (
+      await this.client
+        .getTweetApi()
+        .getUserTweets({ userId: user.user.restId, count: 10 })
+    ).data.data;
   }
   public async getUser(userid: string) {
     if (this.client === null) {
       return undefined;
     }
     if (userid.match(/^[0-9]+$/) !== null) {
-      const data = (await this.client.getUserApi().getUserByRestId({ "userId": userid })).data
-      return data
+      const data = (
+        await this.client.getUserApi().getUserByRestId({ userId: userid })
+      ).data;
+      return data;
     } else if (userid.match(/^[a-zA-Z0-9_]+$/) !== null) {
-      return (await this.client.getUserApi().getUserByScreenName({ "screenName": userid })).data
+      return (
+        await this.client
+          .getUserApi()
+          .getUserByScreenName({ screenName: userid })
+      ).data;
     }
   }
   public async startTimer(client: Client) {
-    this.subscriptions = (await subscriptionCollection.find({}).toArray())
+    this.subscriptions = await subscriptionCollection.find({}).toArray();
     const exec = async () => {
-      console.log("exec")
-      this.subscriptions.forEach(async sub => {
+      this.subscriptions.forEach(async (sub) => {
         try {
-          const tweets = await this.getTweets(sub.twitterUserId)
-          console.log(tweets)
-          const now = new Date()
-          tweets?.forEach(async tweet => {
+          const tweets = await this.getTweets(sub.twitterUserId);
+          const now = new Date();
+          tweets?.forEach(async (tweet) => {
             const time = tweet.tweet.legacy?.createdAt;
-            if (!time) { return }
-            const date = new Date(time)
+            if (!time) {
+              return;
+            }
+            const date = new Date(time);
             if (now.getTime() - date.getTime() < this.interval) {
               const embed = new EmbedBuilder()
                 .setTitle(
-                  `${tweet.user?.legacy.name}さんによるツイート (@${tweet.user?.legacy.screenName})`
+                  `${tweet.user?.legacy.name}さんによるツイート (@${tweet.user?.legacy.screenName})`,
                 )
                 .setURL(
-                  `https://twitter.com/${tweet.user?.legacy.screenName}/status/${tweet.tweet.legacy?.idStr}`
+                  `https://twitter.com/${tweet.user?.legacy.screenName}/status/${tweet.tweet.legacy?.idStr}`,
                 )
                 .setTimestamp(date)
                 .setColor(0x00ffff)
                 .setImage(
-                  tweet.tweet.legacy?.entities?.media?.[0]?.mediaUrlHttps ?? ""
+                  tweet.tweet.legacy?.entities?.media?.[0]?.mediaUrlHttps ?? "",
                 )
                 .setDescription(tweet.tweet.legacy?.fullText ?? "none")
                 .setAuthor({
@@ -86,40 +102,42 @@ export class Twitter {
                   url: `https://twitter.com/${tweet.user?.legacy.screenName}`,
                   iconURL: tweet.user?.legacy.profileImageUrlHttps ?? "none",
                 });
-              const channel = client.channels.cache.get(sub.channelId)
-              if (channel?.isTextBased()) {
-                channel.send({ embeds: [embed] })
+              const channel = client.channels.cache.get(sub.channelId);
+              if (channel?.isTextBased() && channel.isSendable()) {
+                channel.send({ embeds: [embed] });
               }
             }
-          })
-
-        } catch (e) {
-          client.user?.setActivity("X API ERROR", { type: ActivityType.Playing })
+          });
+        } catch {
+          client.user?.setActivity("X API ERROR", {
+            type: ActivityType.Playing,
+          });
         }
-      })
-      client.user?.setActivity("x!help", { type: ActivityType.Playing })
-    }
-    exec()
+      });
+      client.user?.setActivity("x!help", { type: ActivityType.Playing });
+    };
+    exec();
     this.timer = setInterval(exec, this.interval);
   }
   public reloadTimer(client: Client) {
     if (this.timer) {
-      clearInterval(this.timer)
+      clearInterval(this.timer);
     }
     this.startTimer(client);
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getApiClientFromEmailAndPassword = async (
   email: string,
   username: string,
   password: string,
-  authorization?: () => string
+  authorization?: () => string,
 ) => {
   const api = new TwitterOpenApi();
   const rclient = await login(email, username, password, authorization);
   return api.getClientFromCookies(
-    rclient.cookie
+    rclient.cookie,
     // rclient.cookie.ct0 ??
     // (() => {
     //   throw new Error("ct0 is null");

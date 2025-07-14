@@ -2,7 +2,6 @@ import { eventHandler } from "../manager/base";
 
 export const handler: eventHandler<"messageCreate"> = {
   name: "messageCreate",
-  exec: async (bot, message) => {
-    
-  }
-}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  exec: async (bot, message) => {},
+};

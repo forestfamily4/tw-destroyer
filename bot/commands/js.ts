@@ -1,5 +1,5 @@
 import { Lang, LangFormat, runCode } from "../lib/langRunner.js";
-import { commandHandler } from "../manager/base.js"
+import { commandHandler } from "../manager/base.js";
 import { AttachmentBuilder } from "discord.js";
 
 export const handler: commandHandler = {
@@ -9,6 +9,9 @@ export const handler: commandHandler = {
   authority: "admin",
   async exec(bot, message, args) {
     try {
+      if (!message.channel.isSendable()) {
+        return;
+      }
       const code = args.join(" ");
       const result = await runCode(code.trim(), Lang.JS, message, bot);
       if (result.length > 2000) {
@@ -21,10 +24,12 @@ export const handler: commandHandler = {
         });
         return;
       }
-      await message.channel.send(`\`\`\`${LangFormat[Lang.JS]}\n${result}\n\`\`\``);
+      await message.channel.send(
+        `\`\`\`${LangFormat[Lang.JS]}\n${result}\n\`\`\``,
+      );
       return;
-    } catch  {
+    } catch {
       message.reply(`Error`);
     }
   },
-}
+};

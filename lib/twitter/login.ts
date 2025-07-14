@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import { Client, Cookie } from "./client";
 import chalk from "chalk";
 export const login = async (
@@ -52,16 +51,17 @@ const updateToken = async (
     const res = await client.request("POST", url, params, data);
     const info = res.data;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const subtasks = info.subtasks as Array<any>;
     subtasks?.forEach((task) => {
       if (task.enter_text?.keyboard_type === "email") {
         console.log(
           chalk.yellow(
             `WARING ${Object.entries(task)
-              .filter(([k, v]) => {
+              .filter(([k]) => {
                 return k === "text";
               })
-              .map(([k, v]) => v as string)
+              .map(([, v]) => v as string)
               .join(",")}`,
           ),
         );
@@ -78,7 +78,7 @@ const updateToken = async (
     });
 
     client.cookie[key] = info[key];
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.log(chalk.red(`ERROR ${e}`));
     client.cookie.flow_errors = "true";
     console.log(chalk.red("ERROR failed to update token."));

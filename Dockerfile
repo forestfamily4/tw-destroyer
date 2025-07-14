@@ -1,10 +1,10 @@
-FROM node:20-slim
+FROM node:24-slim
 
 WORKDIR /app
 
 COPY . .
 
-RUN npm install
-RUN npx tsc
+RUN yarn install --frozen-lockfile
+RUN yarn build
 
 CMD [ "node", "dist/index.js" ]

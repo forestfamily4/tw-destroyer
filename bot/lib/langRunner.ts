@@ -10,6 +10,9 @@ export async function run(
   code?: string,
 ) {
   const channel = message.channel;
+  if (!channel.isSendable()) {
+    return;
+  }
   if (!code) return channel.send("plz input code.");
   const result = await runCode(code.trim(), lang, message, client);
   if (result.length > 2000) {
@@ -56,7 +59,7 @@ export async function exec(code: string) {
 }
 
 export const Runner = {
-  // eslint-disable-next-line unused-imports/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async [Lang.JS](str: string, message: Message, client: Bot) {
     try {
       return await new Promise<string>((resolve) => resolve(eval(str))).then(

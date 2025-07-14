@@ -12,8 +12,7 @@ export class Client {
   ) {
     if (typeof cookie === "string") {
       this.cookie = this.parseCookie(cookie);
-    }
-    else {
+    } else {
       this.cookie = cookie;
     }
   }
@@ -21,12 +20,12 @@ export class Client {
     method: "POST" | "GET",
     url: string,
     params?: object,
-    data?: any,
+    data?: unknown,
   ) {
     await this.getHeaders();
 
     if (method == "POST") {
-      return new Promise<any>((resolve, reject) => {
+      return new Promise<unknown>((resolve, reject) => {
         axios
           .post(url, data, {
             headers: this.headers,
@@ -41,11 +40,11 @@ export class Client {
           .catch((err) => {
             reject(err);
             const ee = err as AxiosError;
-            console.log(chalk.red(JSON.stringify(ee?.response?.data)));            
+            console.log(chalk.red(JSON.stringify(ee?.response?.data)));
           });
       });
     } else {
-      return new Promise<any>((resolve, reject) => {
+      return new Promise<unknown>((resolve, reject) => {
         axios
           .get(url, {
             headers: this.headers,
@@ -66,7 +65,7 @@ export class Client {
     }
   }
 
-  private setCookie(res?: AxiosResponse<any, any>) {
+  private setCookie(res?: AxiosResponse<unknown, unknown>) {
     res?.headers["set-cookie"]?.forEach((cookie: string) => {
       const [key, value] = cookie.split(";")[0].split("=");
       const key2 = key.trim() as keyof Cookie;

@@ -19,7 +19,7 @@ export class Server {
   }
   private uptime() {
     setTimeout(async () => {
-      const res = await axios.get(this.host, {
+      await axios.get(this.host, {
         params: {
           key: this.now,
         },
