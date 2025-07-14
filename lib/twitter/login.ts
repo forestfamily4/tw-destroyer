@@ -49,11 +49,12 @@ const updateToken = async (
     }`;
 
     const res = await client.request("POST", url, params, data);
-    const info = res.data;
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const subtasks = info.subtasks as Array<any>;
-    subtasks?.forEach((task) => {
+    const info = res.data as Record<string, any>;
+
+    const subtasks = info.subtasks;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    subtasks?.forEach((task:any) => {
       if (task.enter_text?.keyboard_type === "email") {
         console.log(
           chalk.yellow(

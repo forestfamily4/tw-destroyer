@@ -11,7 +11,8 @@ import { config } from "../lib/config.js";
 import { Bot } from "../bot.js";
 export interface handler {
   name: string;
-  exec: (...args: unknown[]) => void | Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  exec: (...args: any[]) => void | Promise<void>;
 }
 export type Authority = "admin" | "everyone";
 

@@ -20,12 +20,12 @@ export class Client {
     method: "POST" | "GET",
     url: string,
     params?: object,
-    data?: unknown,
+    data?: object,
   ) {
     await this.getHeaders();
 
     if (method == "POST") {
-      return new Promise<unknown>((resolve, reject) => {
+      return new Promise<AxiosResponse<unknown,unknown>>((resolve, reject) => {
         axios
           .post(url, data, {
             headers: this.headers,
@@ -44,7 +44,7 @@ export class Client {
           });
       });
     } else {
-      return new Promise<unknown>((resolve, reject) => {
+      return new Promise<AxiosResponse<unknown,unknown>>((resolve, reject) => {
         axios
           .get(url, {
             headers: this.headers,
